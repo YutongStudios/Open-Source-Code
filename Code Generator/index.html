@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Code Generator</title>
+  <style>
+    /* Styles for the container and layout */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Heading style */
+    h1 {
+      margin-top: 0;
+    }
+
+    /* Label style */
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    /* Input field style */
+    input[type="number"],
+    input[type="text"] {
+      width: 95%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    /* Checkbox style */
+    input[type="checkbox"] {
+      margin-left: 10px;
+    }
+
+    /* Button style */
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* Code display style */
+    #code-display {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 4px;
+      background-color: #f5f5f5;
+      white-space: nowrap;
+      overflow-x: auto;
+      min-height: 21px;
+      text-align: left;
+    }
+
+    /* Copy button style */
+    #copy-button {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Code Generator</h1>
+    <form id="code-form">
+      <!-- Preset Text Input -->
+      <label for="preset-text">Preset Text:</label>
+      <input type="text" id="preset-text" placeholder="Enter preset text">
+
+      <!-- Code Length Input -->
+      <label for="code-length">Code Length:</label>
+      <input type="number" id="code-length" min="1" max="1000000" value="16" required>
+
+      <!-- Checkboxes for options -->
+      <label><input type="checkbox" id="include-letters">Include Letters</label>
+      <label><input type="checkbox" id="include-numbers">Include Numbers</label>
+
+      <!-- Number of Codes Input -->
+      <label for="num-codes">Number of Codes:</label>
+      <input type="number" id="num-codes" min="1" max="100" value="1" required>
+
+      <!-- Generate Code Button -->
+      <button type="submit">Generate Code</button>
+    </form>
+
+    <!-- Display Generated Codes -->
+    <div id="code-display"></div>
+    <!-- Copy Code Button -->
+    <button id="copy-button">Copy Codes</button>
+  </div>
+
+  <script>
+    const form = document.getElementById('code-form');
+    const codeDisplay = document.getElementById('code-display');
+    const copyButton = document.getElementById('copy-button');
+
+    // Handle form submission
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      // Get the selected options from the form
+      const codeLength = document.getElementById('code-length').value;
+      const includeLetters = document.getElementById('include-letters').checked;
+      const includeNumbers = document.getElementById('include-numbers').checked;
+      const presetText = document.getElementById('preset-text').value;
+      const numCodes = document.getElementById('num-codes').value;
+
+      // Check if neither option (letters or numbers) is selected
+      if (!includeLetters && !includeNumbers && presetText === '') {
+        alert('Please select at least one option (Include Letters, Include Numbers, or enter a Preset Text).');
+        return;
+      }
+
+      // Generate the codes based on the selected options and preset text
+      const codes = generateCodes(codeLength, includeLetters, includeNumbers, presetText, numCodes);
+
+      // Display the generated codes
+      displayCodes(codes);
+    });
+
+    // Handle copy button click
+    copyButton.addEventListener('click', function() {
+      copyToClipboard(codeDisplay.textContent);
+    });
+
+    function generateCodes(length, letters, numbers, presetText, numCodes) {
+      let codes = [];
+
+      for (let i = 0; i < numCodes; i++) {
+        let code = '';
+
+        // Build the character pool based on the selected options
+        let characterPool = '';
+        if (letters) {
+          characterPool += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        }
+        if (numbers) {
+          characterPool += '0123456789';
+        }
+
+        // Generate the code
+        for (let j = 0; j < length; j++) {
+          const randomIndex = Math.floor(Math.random() * characterPool.length);
+          code += characterPool[randomIndex];
+        }
+
+        // Add the preset text if provided
+        code = presetText.toUpperCase() + code;
+
+        // Add the code to the list
+        codes.push(code);
+      }
+
+      return codes;
+    }
+
+    function generateRandomString(length, characterPool) {
+      let result = '';
+
+      for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characterPool.length);
+        result += characterPool[randomIndex];
+      }
+
+      return result;
+    }
+
+    function displayCodes(codes) {
+      codeDisplay.innerHTML = '';
+
+      codes.forEach(function(code) {
+        const codeElement = document.createElement('div');
+        codeElement.textContent = code;
+        codeDisplay.appendChild(codeElement);
+      });
+    }
+
+    // Function to copy codes to clipboard
+    function copyToClipboard(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      alert('Codes copied to clipboard!');
+    }
+  </script>
+</body>
+</html>
